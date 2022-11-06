@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+
+//importando bibli do tailwind
+
+body {
+    -webkit-font-smoothing: antialiassed;
+}
