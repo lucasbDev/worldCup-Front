@@ -4,9 +4,11 @@ import Image from 'next/image'
 import logoImg from '../assets/logo.svg'
 import userAvatar from '../assets/users-avatar-example.png'
 import iconCheck from '../assets/icon-check.svg'
+import { api } from  '../lib/axios'
 
 interface HomeProps {
   boloesCount: number;
+  guessesCount: number;
 }
 
 
@@ -44,7 +46,7 @@ export default function Home(props: HomeProps) {
             <div className="flex items-center gap-6">
               <Image src={iconCheck} alt=""/>
               <div>
-                <span className="font bold text-2xl">+1643</span>
+                <span className="font bold text-2xl">{props.guessesCount}</span>
                 <span>Bolões Palpites</span>
               </div>
             </div>
@@ -61,14 +63,13 @@ export default function Home(props: HomeProps) {
 
 //consumindo a api
 export const getServerSideProps = async () => {
-  const response = await fetch('http://localhost:3333/boloes/count')
-  const data = await response.json()
-
-  console.log(data)
+  const bolaoCountResponse = await api.get('boloes/count')
+  const guessesCountResponse = await api.get('guesses/count')
 
   return {
     props: {
-      bolaoCount: data.count,
+      bolaoCount:bolaoCountResponse.data.count,
+      guessesCount:guessesCountResponse.data.count,
     }
   }
 }
