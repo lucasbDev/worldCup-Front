@@ -63,7 +63,7 @@ export default function Home(props: HomeProps) {
 
 //consumindo a api
 export const getServerSideProps = async () => {
-  const bolaoCountResponse = await api.get('boloes/count')
+  const bolaoCountResponse = await api.get('bolao/count')
   const guessesCountResponse = await api.get('guesses/count')
 
   return {
