@@ -5,6 +5,7 @@ import logoImg from '../public/logo.svg'
 import userAvatar from '../public/users-avatar-example.png'
 import iconCheck from '../public/icon-check.svg'
 import { api } from  '../lib/axios'
+import { GetStaticProps } from 'next'
 
 interface HomeProps {
   boloesCount: number;
@@ -37,7 +38,7 @@ export default function Home(props: HomeProps) {
     }
   }
   return (
-    <div className="max-w-[1124px] h-screen mx-auto grid-cols-2 gap-28 items-center">
+        <div className="max-w-[1156px] min-h-screen px-4 pt-[3.75rem] pb-24 mx-auto grid grid-cols-2 gap-28 items-center">
       <main>
         <Image src={logoImg} alt="NLW cup"/>
 
@@ -72,31 +73,30 @@ export default function Home(props: HomeProps) {
             <div className="flex items-center gap-6">
               <Image src={iconCheck} alt=""/>
               <div>
-                <span className="font bold text-2xl">{props.boloesCount}</span>
-                <span>Bolões criados</span>
+                <span className="font bold text-2xl">{props.boloesCount}</span> Bolões criados
               </div>
             </div>
             <div className="2-px h-14 bg-gray-600"></div>
-            <div className="flex items-center gap-6">
+            <div className="items-center gap-6 flex">
               <Image src={iconCheck} alt=""/>
-              <div>
-                <span className="font bold text-2xl">{props.guessesCount}</span>
-                <span>Bolões Palpites</span>
+              <div className="flex flex-col">
+                <span className="font bold text-2xl">{props.guessesCount}</span> Palpites
               </div>
             </div>
           </div>
       </main>
-
-      <Image 
-      src={appPreview} alt="Dois Celulares exibidos" 
-      quality={100}
-      />
+      <footer className="flex">
+        <Image 
+        src={appPreview} alt="Dois Celulares exibidos" 
+        quality={100}
+        />
+      </footer>
     </div>
   )
 }
 
 //consumindo a api
-export const getServerSideProps = async () => {
+export const getStaticProps: GetStaticProps  = async () => {
   const [bolaoCountResponse,  guessesCountResponse, userCountResponse] = await Promise.all([
    api.get('bolao/count'),
    api.get('guess/count'),
