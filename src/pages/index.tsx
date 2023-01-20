@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from "react";
-import appPreview from '../public/app-nlw-copa-preview.png'
+import appPreviewImg from '../public/app-nlw-copa-preview.png'
 import Image from 'next/image'
 import logoImg from '../public/logo.svg'
 import userAvatar from '../public/users-avatar-example.png'
@@ -29,7 +29,7 @@ export default function Home(props: HomeProps) {
 				.post(
 					'pools',
 					{
-						title: poolTitle,
+						title: bolaoTitle,
 					},
 					{
 						timeout: 10000,
@@ -41,14 +41,14 @@ export default function Home(props: HomeProps) {
 							setTimeout(() => {
 								const { code } = response.data;
 								navigator.clipboard.writeText(code);
-								setPoolTitle('');
+								setBolaoTitle('');
 								setIsCreatingPool(false);
 								resolve(code);
 							}, 1000);
 						})
 				)
 				.catch((err) => {
-					setPoolTitle('');
+					setBolaoTitle('');
 					setIsCreatingPool(false);
 					throw err;
 				}),
@@ -83,12 +83,12 @@ export default function Home(props: HomeProps) {
         </div>
 
         <form
-					onSubmit={createPool}
+					onSubmit={createBolao}
 					className='mt-10 flex flex-col md:flex-row items-center w-full md:w-auto gap-4 md:gap-2'>
 					<input
 						type='text'
-						value={poolTitle}
-						onChange={(event) => setPoolTitle(event.target.value)}
+						value={bolaoTitle}
+						onChange={(event) => setBolaoTitle(event.target.value)}
 						required
 						placeholder='Qual nome do seu bolão?'
 						className='flex-1 w-full md:w-auto py-4 px-6 rounded bg-gray-800 placeholder:text-gray-200 text-gray-100 border border-gray-600 text-sm'
