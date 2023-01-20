@@ -5,6 +5,7 @@ import logoImg from '../public/logo.svg'
 import userAvatar from '../public/users-avatar-example.png'
 import iconCheck from '../public/icon-check.svg'
 import { api } from  '../lib/axios'
+import toast, { Toaster } from 'react-hot-toast';
 import { GetStaticProps } from 'next'
 
 interface HomeProps {
@@ -15,82 +16,121 @@ interface HomeProps {
 
 
 export default function Home(props: HomeProps) {
-  const [bolaoTitle, setBolaoTitle] = useState(" ")
+  const [bolaoTitle, setBolaoTitle] = useState<string>(" ");
+  const [isCreatingPool, setIsCreatingPool] = useState<boolean>(false);
+
 
   async function createBolao(event: FormEvent) {
+    setIsCreatingPool(true);
     event.preventDefault( )
 
-    try {
-      const response = await api.post('bolao', {
-        title: bolaoTitle,
-      });
+    toast.promise(
+			api
+				.post(
+					'pools',
+					{
+						title: poolTitle,
+					},
+					{
+						timeout: 10000,
+					}
+				)
+				.then(
+					(response) =>
+						new Promise((resolve) => {
+							setTimeout(() => {
+								const { code } = response.data;
+								navigator.clipboard.writeText(code);
+								setPoolTitle('');
+								setIsCreatingPool(false);
+								resolve(code);
+							}, 1000);
+						})
+				)
+				.catch((err) => {
+					setPoolTitle('');
+					setIsCreatingPool(false);
+					throw err;
+				}),
 
-      const { code } = response.data
+			{
+				loading: 'Criando o bolão...',
+				success:
+					'Bolão criado com sucesso!',
+				error: 'Erro ao criar o bolão, tente novamente!',
+			},
+			{
+				className: 'toast-container',
+				duration: 5000,
+			}
+		);
+	}
 
-      await navigator.clipboard.writeText(code) //copiar content
-
-      alert('Bolão criado com sucesso!')
-
-      setBolaoTitle(" ")
-    } catch (err) {
-      console.log(err)
-      alert('Falha ao criar bolão, tente novamente!')
-    }
-  }
   return (
         <div className="max-w-[1156px] min-h-screen px-4 pt-[3.75rem] pb-24 mx-auto grid grid-cols-2 gap-28 items-center">
-      <main>
-        <Image src={logoImg} alt="NLW cup"/>
+          <main className='max-w-[680px]  lg:max-w-lg mx-auto'>
+            <Image src={logoImg} alt="NLW Cup"/>
 
-        <h1 className="mt-14 text-white text-xl font-bold leading-tight"> 
+          <h1 className="mt-14 text-white text-xl font-bold leading-tight"> 
         Faça o seu bolão e compartilhe com a galera
-        </h1>
+          </h1>
 
-        <div className="mt-10 flex items-center gap-2">
-          <Image src={userAvatar} alt="" />
+        <div className="className='mt-10 flex flex-col gap-2 sm:flex-row sm:items-center'">
+          <Image src={userAvatar} alt="" className='w-32 sm:w-36' />
           <strong className="text-gray-100 text-xl">
             <span className="text-default-500">{props.userCount}</span> pessoas já estão no clima!
           </strong>
         </div>
 
-        <form onSubmit={createBolao} className="mt-10  flex gap-2">
-          <input className="flex-1 flex px-6 py-4 rounded bg-gray-800 border border-gray-600 text-sm text-gray-100"
-          type="text" 
-          required 
-          placeholder="Qual o nome do seu bolão?" 
-          onChange={event => setBolaoTitle(event.target.value)}
-          value={bolaoTitle}
-          />
-         
+        <form
+					onSubmit={createPool}
+					className='mt-10 flex flex-col md:flex-row items-center w-full md:w-auto gap-4 md:gap-2'>
+					<input
+						type='text'
+						value={poolTitle}
+						onChange={(event) => setPoolTitle(event.target.value)}
+						required
+						placeholder='Qual nome do seu bolão?'
+						className='flex-1 w-full md:w-auto py-4 px-6 rounded bg-gray-800 placeholder:text-gray-200 text-gray-100 border border-gray-600 text-sm'
+					/>
 
-          <button className="bg-yellow-500 px-6 py-4 rounded text-gray-900 font-bold text-sm uppercase hover:bg-yellow-700"
-          type="submit">CRIAR MEU BOLÃO</button>
-        </form>
+          <button
+						type='submit'
+						disabled={isCreatingPool}
+						className='py-4 px-6 w-full md:w-auto rounded bg-nlw-yellow-500 text-sm uppercase font-bold text-gray-900 hover:bg-nlw-yellow-700 transition-colors'>
+						Criar meu bolão
+					</button>
+				</form>
+
 
           <p className="mt-4 text-sm text-gray-300 leading-relaxed">Após criar seu bolão, você receberá um código!</p>
 
           <div className="mt-10 pt-10 border-t border-gray-600 flex items-center justify-between text-gray-100">
             <div className="flex items-center gap-6">
               <Image src={iconCheck} alt=""/>
-              <div>
-                <span className="font bold text-2xl">{props.boloesCount}</span> Bolões criados
+              <div className='flex flex-col gap-1'>
+                <span className="font bold text-2xl">{props.boloesCount}</span>
+                <span> Bolões criados </span>
               </div>
             </div>
             <div className="2-px h-14 bg-gray-600"></div>
-            <div className="items-center gap-6 flex">
+
+            <div className="items-center gap-6">
               <Image src={iconCheck} alt=""/>
-              <div className="flex flex-col">
-                <span className="font bold text-2xl">{props.guessesCount}</span> Palpites
+              <div className="flex flex-col gap-1">
+                <span className="font bold text-2xl">{props.guessesCount}</span>
+                <span>Palpites enviados</span>
               </div>
             </div>
           </div>
       </main>
-      <footer className="flex">
-        <Image 
-        src={appPreview} alt="Dois Celulares exibidos" 
-        quality={100}
-        />
-      </footer>
+      <Image
+				src={appPreviewImg}
+				alt='Dois celulares sendo exibidos'
+				quality={100}
+				className='pb-12 lg:pb-0'
+			/>
+      <Toaster />
     </div>
   )
 }
@@ -108,6 +148,7 @@ export const getStaticProps: GetStaticProps  = async () => {
       bolaoCount:bolaoCountResponse.data.count,
       guessesCount:guessesCountResponse.data.count,
       userCount:userCountResponse.data.count,
-    }
+    },
+    revalidate: 15 * 60,
   }
 }
